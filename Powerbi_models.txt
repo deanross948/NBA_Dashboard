@@ -1,0 +1,61 @@
+Bottom3PMLogo = 
+VAR selectedSeason = SELECTEDVALUE('nba_analytics nba_data'[Season_start])
+VAR selectedType = SELECTEDVALUE('nba_analytics nba_data'[Season_type])
+VAR selectedConf = SELECTEDVALUE('nba_analytics nba_data'[Conference])
+
+VAR Filtered =
+    FILTER(
+        'nba_analytics nba_data',
+        (ISBLANK(selectedSeason) || 'nba_analytics nba_data'[Season_start] = selectedSeason) &&
+        (ISBLANK(selectedType) || 'nba_analytics nba_data'[Season_type] = selectedType) &&
+        (ISBLANK(selectedConf) || 'nba_analytics nba_data'[Conference] = selectedConf)
+    )
+
+VAR Summary =
+    SUMMARIZE(
+        Filtered,
+        'nba_analytics nba_data'[TEAM],
+        "Total3PM", AVERAGE('nba_analytics nba_data'[FG3M])
+    )
+
+VAR BottomTeam =
+    TOPN(1, Summary, [Total3PM], ASC)
+
+VAR TeamName = MAXX(BottomTeam, [TEAM])
+
+RETURN
+CALCULATE(
+    MAX(Logos[LogoURL]),
+    Logos[TEAM] = TeamName
+)
+
+Top3PMLogo = 
+VAR selectedSeason = SELECTEDVALUE('nba_analytics nba_data'[Season_start])
+VAR selectedType = SELECTEDVALUE('nba_analytics nba_data'[Season_type])
+VAR selectedConf = SELECTEDVALUE('nba_analytics nba_data'[Conference])
+
+VAR Filtered =
+    FILTER(
+        'nba_analytics nba_data',
+        (ISBLANK(selectedSeason) || 'nba_analytics nba_data'[Season_start] = selectedSeason) &&
+        (ISBLANK(selectedType) || 'nba_analytics nba_data'[Season_type] = selectedType) &&
+        (ISBLANK(selectedConf) || 'nba_analytics nba_data'[Conference] = selectedConf)
+    )
+
+VAR Summary =
+    SUMMARIZE(
+        Filtered,
+        'nba_analytics nba_data'[TEAM],
+        "Total3PM", AVERAGE('nba_analytics nba_data'[FG3M])
+    )
+
+VAR TopTeam =
+    TOPN(1, Summary, [Total3PM], DESC)
+
+VAR TeamName = MAXX(TopTeam, [TEAM])
+
+RETURN
+CALCULATE(
+    MAX(Logos[LogoURL]),
+    Logos[TEAM] = TeamName
+)
